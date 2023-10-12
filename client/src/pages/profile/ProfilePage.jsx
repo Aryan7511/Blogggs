@@ -38,7 +38,7 @@ const ProfilePage = () => {
       dispatch(userActions.setUserInfo(data));
       localStorage.setItem("account", JSON.stringify(data));
       queryClient.invalidateQueries(["profile"]);
-      toast.success("Profile is updated",{ duration: 2000 });
+      toast.success("Profile is updated", { duration: 2000 });
     },
     onError: (error) => {
       toast.error(error.message);
