@@ -10,6 +10,7 @@ import {
 
 // Routes
 import userRoutes from "./routes/userRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
 
 // Get the directory name using import.meta.url
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes);
 
 //static assets
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
