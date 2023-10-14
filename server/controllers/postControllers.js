@@ -1,5 +1,6 @@
 import { uploadPicture } from "../middleware/uploadPictureMiddleware.js";
 import Post from "../models/Post.js";
+import Comment from "../models/Comment.js";
 import { fileRemover } from "../utils/fileRemover.js";
 import { v4 as uuidv4 } from "uuid";
 
@@ -78,4 +79,62 @@ const updatePost = async (req, res, next) => {
   }
 };
 
-export { createPost, updatePost };
+const deletePost = async (req, res, next) => {
+  try {
+    const post = await Post.findOneAndDelete({ slug: req.params.slug });
+
+    if (!post) {
+      const error = new Error("Post aws not found");
+      return next(error);
+    }
+
+    await Comment.deleteMany({ post: post._id });
+
+    return res.json({
+      message: "Post is successfully deleted",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getPost = async (req, res, next) => {
+  try {
+    const post = await Post.findOne({ slug: req.params.slug }).populate([
+      {
+        path: "user",
+        select: ["avatar", "name"],
+      },
+      {
+        path: "comments",
+        match: {
+          check: true,
+          parent: null,
+        },
+        populate: [
+          {
+            path: "user",
+            select: ["avatar", "name"],
+          },
+          {
+            path: "replies",
+            match: {
+              check: true,
+            },
+          },
+        ],
+      },
+    ]);
+
+    if (!post) {
+      const error = new Error("Post was not found");
+      return next(error);
+    }
+
+    return res.json(post);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { createPost, updatePost, deletePost, getPost };
