@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import {
   errorResponserHandler,
@@ -20,6 +20,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+
 
 app.get("/", (req, res) => {
   res.send("Server is running...");

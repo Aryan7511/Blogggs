@@ -9,6 +9,7 @@ import { getUserProfile, updateProfile } from "../../services/index/users";
 import ProfilePicture from "../../components/ProfilePicture";
 import { userActions } from "../../store/reducers/userReducers";
 import { toast } from "react-hot-toast";
+import { useMemo } from "react";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -16,11 +17,7 @@ const ProfilePage = () => {
   const queryClient = useQueryClient();
   const userState = useSelector((state) => state.user);
 
-  const {
-    data: profileData,
-    isLoading: profileIsLoading,
-    error: profileError,
-  } = useQuery({
+  const { data: profileData, isLoading: profileIsLoading } = useQuery({
     queryFn: () => {
       return getUserProfile({ token: userState.userInfo.token });
     },
@@ -38,7 +35,7 @@ const ProfilePage = () => {
       dispatch(userActions.setUserInfo(data));
       localStorage.setItem("account", JSON.stringify(data));
       queryClient.invalidateQueries(["profile"]);
-      toast.success("Profile is updated", { duration: 2000 });
+      toast.success("Profile is updated");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -62,10 +59,12 @@ const ProfilePage = () => {
       email: "",
       password: "",
     },
-    values: {
-      name: profileIsLoading ? "" : profileData.name,
-      email: profileIsLoading ? "" : profileData.email,
-    },
+    values: useMemo(() => {
+      return {
+        name: profileIsLoading ? "" : profileData.name,
+        email: profileIsLoading ? "" : profileData.email,
+      };
+    }, [profileData?.email, profileData?.name, profileIsLoading]),
     mode: "onChange",
   });
 
